@@ -86,7 +86,7 @@ mod test {
     }
 
     #[test]
-    fn should_follow_path() {
+    fn all_matches_should_follow_path() {
         let f : fn(&Treeish) -> Vec<&Treeish> = all_matches!( next_treeish
                                                             , Treeish::Node(_, _)
                                                             , Treeish::AltNode(_)
