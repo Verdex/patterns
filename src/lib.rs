@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! all_matches_no_call{
+macro_rules! all_path_matches_no_call{
     ($ret:ident, $next:expr, $structure:expr, $p:pat) => {
         match $structure {
             it @ $p => $ret.push(it),
@@ -11,7 +11,7 @@ macro_rules! all_matches_no_call{
         match $structure {
             it @ $p => {
                 for item in $next(it) {
-                    all_matches_no_call!($ret, $next, item, $($rest)* );
+                    all_path_matches_no_call!($ret, $next, item, $($rest)* );
                 }
             },
             _ => { },
@@ -20,11 +20,11 @@ macro_rules! all_matches_no_call{
 }
 
 #[macro_export]
-macro_rules! all_matches {
+macro_rules! all_path_matches {
     ($next:expr, $($rest:tt)+) => {
         |structure| {
             let mut ret = vec![];
-            all_matches_no_call!(ret, $next, structure, $($rest)+);
+            all_path_matches_no_call!(ret, $next, structure, $($rest)+);
             ret
         }
     };
@@ -62,7 +62,7 @@ mod test {
 
     #[test]
     fn should_return_single_pattern_matches() {
-        let f : fn(&Treeish) -> Vec<&Treeish> = all_matches!(next_treeish, Treeish::Leaf(_));
+        let f : fn(&Treeish) -> Vec<&Treeish> = all_path_matches!(next_treeish, Treeish::Leaf(_));
 
         let input = l(1);
 
@@ -74,7 +74,7 @@ mod test {
 
     #[test]
     fn should_return_two_pattern_matches() {
-        let f : fn(&Treeish) -> Vec<&Treeish> = all_matches!(next_treeish, Treeish::Node(_, _), Treeish::Leaf(_));
+        let f : fn(&Treeish) -> Vec<&Treeish> = all_path_matches!(next_treeish, Treeish::Node(_, _), Treeish::Leaf(_));
 
         let input = n(l(1), l(2));
 
@@ -86,8 +86,8 @@ mod test {
     }
 
     #[test]
-    fn all_matches_should_follow_path() {
-        let f : fn(&Treeish) -> Vec<&Treeish> = all_matches!( next_treeish
+    fn all_path_matches_should_follow_path() {
+        let f : fn(&Treeish) -> Vec<&Treeish> = all_path_matches!( next_treeish
                                                             , Treeish::Node(_, _)
                                                             , Treeish::AltNode(_)
                                                             , Treeish::Node(_, _)
